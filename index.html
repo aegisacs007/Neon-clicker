@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neon Money Clicker</title>
     <style>
         body {
-            background-color: #1a1a1a;
+            background-color: #0d0d0d;
             color: white;
             font-family: 'Courier New', Courier, monospace;
             text-align: center;
@@ -16,144 +16,227 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
-            user-select: none; /* Prevents highlighting text while tapping */
+            touch-action: manipulation;
         }
-        h1 { margin-top: 20px; text-shadow: 0 0 10px #00ff00; }
+
+        /* LIVE STATS BAR */
+        .live-stats {
+            width: 100%;
+            background: #111;
+            padding: 8px;
+            font-size: 12px;
+            color: #00ff00;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-around;
+        }
+        .stat-dot {
+            height: 8px; width: 8px; background: #f00; border-radius: 50%; display: inline-block;
+            animation: pulse 1s infinite; margin-right: 5px;
+        }
+        @keyframes pulse { 0% {opacity:1;} 50% {opacity:0.5;} 100% {opacity:1;} }
+        
+        h1 { margin: 10px 0 5px 0; font-size: 22px; text-shadow: 0 0 10px #d600ff; letter-spacing: 2px; }
+        .author { font-size: 10px; color: #666; margin-bottom: 10px; }
         
         #score-board {
-            background: #222;
-            padding: 15px 30px;
+            background: #1a1a1a;
+            padding: 10px 30px;
             border-radius: 50px;
-            border: 2px solid #00ff00;
-            margin: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            border: 2px solid #d600ff;
+            margin: 5px;
+            box-shadow: 0 0 15px rgba(214, 0, 255, 0.2);
+            min-width: 180px;
         }
-        #score { font-size: 32px; font-weight: bold; color: #00ff00; }
+        #score { font-size: 32px; font-weight: bold; color: #fff; text-shadow: 0 0 5px #fff; }
         
-        /* THE BIG BUTTON */
-        #click-btn {
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle, #ff00de, #990085);
-            border-radius: 50%;
-            border: 5px solid white;
-            font-size: 60px;
-            cursor: pointer;
-            transition: transform 0.05s;
-            box-shadow: 0 0 30px #ff00de;
+        /* THE CLICK BUTTON */
+        #click-area {
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 30px;
-            -webkit-tap-highlight-color: transparent;
+            width: 100%;
         }
-        #click-btn:active { transform: scale(0.90); }
+        #click-btn {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #00ff00, #004d00);
+            border-radius: 50%;
+            border: 6px solid #fff;
+            font-size: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 30px #00ff00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            transition: transform 0.05s;
+        }
+        #click-btn:active { transform: scale(0.92); }
 
         /* SHOP */
-        .shop { width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 10px; }
+        .shop { 
+            width: 100%; 
+            background: #161616; 
+            padding: 20px; 
+            border-top: 2px solid #333; 
+            border-radius: 20px 20px 0 0;
+            box-sizing: border-box;
+            max-height: 40%;
+            overflow-y: auto;
+        }
         .upgrade-btn {
-            background: #333;
-            border: 1px solid #555;
+            background: #222;
+            border: 1px solid #333;
             color: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
         }
-        .upgrade-btn:active { background: #444; }
-        .price { color: #ffff00; font-weight: bold; }
-        
-        .disabled { opacity: 0.5; pointer-events: none; }
+        .upgrade-btn:active { background: #333; }
+        .price { color: #ffd700; font-weight: bold; }
+        .disabled { opacity: 0.4; pointer-events: none; }
 
-        footer { margin-top: auto; padding: 10px; color: #666; font-size: 10px; }
+        .floater {
+            position: absolute; color: white; font-weight: bold; font-size: 24px;
+            pointer-events: none; animation: floatUp 0.8s ease-out forwards;
+        }
+        @keyframes floatUp { 0% {transform:translateY(0); opacity:1;} 100% {transform:translateY(-50px); opacity:0;} }
+
+        footer { padding: 10px; font-size: 11px; color: #444; }
     </style>
 </head>
 <body>
 
-    <h1>NEON CLICKER 💰</h1>
+    <div class="live-stats">
+        <span><span class="stat-dot"></span>LIVE: <span id="online-count">842</span> Players</span>
+        <span>SERVER: <span style="color:#00ff00">ONLINE</span></span>
+    </div>
+
+    <h1>NEON CLICKER</h1>
+    <div class="author">Made by Acs ⚡</div>
 
     <div id="score-board">
         $<span id="score">0</span>
     </div>
 
-    <div id="click-btn" onclick="clickCoin()">💎</div>
+    <div id="click-area">
+        <div id="click-btn" onclick="clickCoin(event)">💸</div>
+    </div>
 
     <div class="shop">
         <div class="upgrade-btn" id="btn1" onclick="buyUpgrade(1)">
-            <span>👆 Better Clicks (+1/tap)</span>
+            <div><b>👆 Power Tap</b> <span style="font-size:10px; color:#aaa;">(+1/click)</span></div>
             <span class="price">$50</span>
         </div>
         <div class="upgrade-btn" id="btn2" onclick="buyUpgrade(2)">
-            <span>🤖 Auto-Bot (+5/sec)</span>
+             <div><b>🤖 Auto-Bot</b> <span style="font-size:10px; color:#aaa;">(+5/sec)</span></div>
             <span class="price">$200</span>
         </div>
         <div class="upgrade-btn" id="btn3" onclick="buyUpgrade(3)">
-            <span>🏭 Money Farm (+20/sec)</span>
+             <div><b>🏭 Money Farm</b> <span style="font-size:10px; color:#aaa;">(+20/sec)</span></div>
             <span class="price">$1000</span>
         </div>
     </div>
 
-    <footer>Tap the Diamond • Save is Automatic</footer>
+    <footer>Build v2.0 • Auto-Save ON</footer>
 
     <script>
-        // Game State
+        // --- AUDIO SYSTEM ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'coin') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+            }
+        }
+
+        // --- GAME VARIABLES ---
         let score = 0;
         let clickValue = 1;
         let autoIncome = 0;
 
-        // Load Game if saved
-        if(localStorage.getItem('neonSave')) {
-            const save = JSON.parse(localStorage.getItem('neonSave'));
-            score = save.score;
-            clickValue = save.clickValue;
-            autoIncome = save.autoIncome;
+        // Load Save
+        if(localStorage.getItem('neonSaveV3')) {
+            const save = JSON.parse(localStorage.getItem('neonSaveV3'));
+            score = save.score || 0;
+            clickValue = save.clickValue || 1;
+            autoIncome = save.autoIncome || 0;
         }
 
         const scoreEl = document.getElementById('score');
 
-        // Update UI Loop
+        // Loop
         setInterval(() => {
-            score += autoIncome;
-            updateUI();
-            saveGame();
+            if(autoIncome > 0) { score += autoIncome; updateUI(); saveGame(); }
         }, 1000);
 
-        function clickCoin() {
+        // FAKE LIVE PLAYERS LOGIC
+        setInterval(() => {
+            let current = parseInt(document.getElementById('online-count').innerText);
+            let change = Math.floor(Math.random() * 10) - 4; // Random + or -
+            document.getElementById('online-count').innerText = current + change;
+        }, 3000);
+
+        function clickCoin(event) {
             score += clickValue;
-            // Visual Effect
-            const btn = document.getElementById('click-btn');
-            btn.style.transform = "scale(0.95)";
-            setTimeout(() => btn.style.transform = "scale(1)", 50);
+            playSound('coin');
+            showFloatingText(event);
             updateUI();
+            saveGame();
         }
 
         function buyUpgrade(type) {
-            if (type === 1 && score >= 50) {
-                score -= 50;
-                clickValue += 1;
-            } else if (type === 2 && score >= 200) {
-                score -= 200;
-                autoIncome += 5;
-            } else if (type === 3 && score >= 1000) {
-                score -= 1000;
-                autoIncome += 20;
-            }
+            if (type === 1 && score >= 50) { score -= 50; clickValue += 1; playSound('buy'); }
+            else if (type === 2 && score >= 200) { score -= 200; autoIncome += 5; playSound('buy'); }
+            else if (type === 3 && score >= 1000) { score -= 1000; autoIncome += 20; playSound('buy'); }
             updateUI();
         }
 
+        function showFloatingText(e) {
+            const floater = document.createElement('div');
+            floater.className = 'floater';
+            floater.innerText = '+$' + clickValue;
+            let x = e ? e.clientX : window.innerWidth/2;
+            let y = e ? e.clientY : window.innerHeight/2;
+            floater.style.left = (x - 15) + 'px';
+            floater.style.top = (y - 30) + 'px';
+            document.body.appendChild(floater);
+            setTimeout(() => { floater.remove(); }, 800);
+        }
+
         function updateUI() {
-            scoreEl.innerText = score;
-            
-            // Check prices to grey out buttons
-            document.getElementById('btn1').style.opacity = score >= 50 ? 1 : 0.5;
-            document.getElementById('btn2').style.opacity = score >= 200 ? 1 : 0.5;
-            document.getElementById('btn3').style.opacity = score >= 1000 ? 1 : 0.5;
+            scoreEl.innerText = Math.floor(score);
+            document.getElementById('btn1').style.opacity = score >= 50 ? 1 : 0.4;
+            document.getElementById('btn2').style.opacity = score >= 200 ? 1 : 0.4;
+            document.getElementById('btn3').style.opacity = score >= 1000 ? 1 : 0.4;
         }
 
         function saveGame() {
-            localStorage.setItem('neonSave', JSON.stringify({score, clickValue, autoIncome}));
+            localStorage.setItem('neonSaveV3', JSON.stringify({score, clickValue, autoIncome}));
         }
         
         updateUI();

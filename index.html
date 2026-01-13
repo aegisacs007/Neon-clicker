@@ -19,12 +19,12 @@
             touch-action: manipulation;
         }
 
-        /* LIVE STATS BAR */
+        /* LIVE STATS BAR (The Hype) */
         .live-stats {
             width: 100%;
             background: #111;
             padding: 8px;
-            font-size: 12px;
+            font-size: 11px;
             color: #00ff00;
             border-bottom: 1px solid #333;
             display: flex;
@@ -37,7 +37,7 @@
         @keyframes pulse { 0% {opacity:1;} 50% {opacity:0.5;} 100% {opacity:1;} }
         
         h1 { margin: 10px 0 5px 0; font-size: 22px; text-shadow: 0 0 10px #d600ff; letter-spacing: 2px; }
-        .author { font-size: 10px; color: #666; margin-bottom: 10px; }
+        .author { font-size: 10px; color: #666; margin-bottom: 5px; }
         
         #score-board {
             background: #1a1a1a;
@@ -101,7 +101,6 @@
         }
         .upgrade-btn:active { background: #333; }
         .price { color: #ffd700; font-weight: bold; }
-        .disabled { opacity: 0.4; pointer-events: none; }
 
         .floater {
             position: absolute; color: white; font-weight: bold; font-size: 24px;
@@ -109,7 +108,14 @@
         }
         @keyframes floatUp { 0% {transform:translateY(0); opacity:1;} 100% {transform:translateY(-50px); opacity:0;} }
 
-        footer { padding: 10px; font-size: 11px; color: #444; }
+        /* REAL VISITOR COUNTER STYLES */
+        footer { 
+            padding: 15px; 
+            font-size: 11px; 
+            color: #444; 
+            background: #000;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -145,7 +151,10 @@
         </div>
     </div>
 
-    <footer>Build v2.0 • Auto-Save ON</footer>
+    <footer>
+        <div style="margin-bottom:5px;">Build v3.0 (Tracker Added)</div>
+        <img src="https://visitor-badge.laobi.icu/badge?page_id=aegisacs007.neon-clicker&left_text=Total%20Visits" alt="Real Visitor Count">
+    </footer>
 
     <script>
         // --- AUDIO SYSTEM ---
